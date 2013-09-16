@@ -1,0 +1,104 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:head>
+        <title>WvW Objectives Tracker</title>
+        <link rel="stylesheet" type="text/css" href="css/events.css"/>
+        <script src="script/soundmanager2-nodebug-jsmin.js"></script>  
+        <script src="script/sound.js"></script>
+        <script  type="text/javascript">
+        
+        soundManager.setup({
+        	  url: 'resources/swf/',
+        	  flashVersion: 9, 
+        	  debugMode: false,// optional: shiny features (default = 8)
+        	  // optional: ignore Flash where possible, use 100% HTML5 mode
+        	  // preferFlash: false,
+        	  onready: function() {
+        	    // Ready to use; soundManager.createSound() etc. can now be called.
+        		  pingSound = soundManager.createSound({id: 'sound', url: 'resources/bell-ringing-04.mp3'});
+        		  
+        	  }
+        	});
+        
+		function startTime()
+		{
+			playSound();
+			t=setTimeout(function(){startTime()},1000);
+		}
+		</script>
+    </h:head>
+    <h:body onload="startTime();">
+    	<p:layout fullPage="true">
+    		<p:layoutUnit position="center" header="WvW Objectives" resizable="true" closable="false" collapsible="false">
+    			<h:form id="form">
+        			<p:poll interval="60"   
+	            		listener="#{ajaxPollBean.updateEventServer(serv1Table, serv2Table, serv3Table, ebTable)}" 
+	            		widgetVar="poll" autoStart="true"/>
+	    			<p:dashboard id="board" model="#{dashboardBean.model}">
+		        		 <p:ajax event="reorder"/>
+		        		 <p:panel id="serv1Panel" header="#{checkboxBean.serv1Name} - Red" toggleable="true" collapsed="#{dashboardBean.serv1Collapsed}">
+		        		 	<p:ajax event="toggle" listener="#{dashboardBean.handleServ1Toggle}"/>
+		        		 	<p:dataTable binding="#{serv1Table}" var="status" value="#{wvwObjectiveBean.redWorldStatus}" styleClass="hide-column-names" rowStyleClass="#{status.color}">
+		        		 		<p:column>  
+						            <h:panelGroup id="eventCol">#{status.objective}</h:panelGroup>  
+						        </p:column>  
+						        <p:column styleClass="soundClass">
+						        	<h:panelGroup id="soundCol">#{status.playSound}</h:panelGroup>
+						        </p:column>
+		        		 	</p:dataTable>
+		        		 </p:panel>
+		        		 <p:panel id="serv2Panel" header="#{checkboxBean.serv2Name} - Green" toggleable="true" collapsed="#{dashboardBean.serv2Collapsed}">
+		        		 	<p:ajax event="toggle" listener="#{dashboardBean.handleServ2Toggle}"/>
+		        		 	<p:dataTable binding="#{serv2Table}" var="status" value="#{wvwObjectiveBean.greenWorldStatus}" styleClass="hide-column-names" rowStyleClass="#{status.color}">
+		        		 		<p:column>  
+						            <h:panelGroup id="eventCol">#{status.objective}</h:panelGroup>  
+						        </p:column>  
+						        <p:column styleClass="soundClass">
+						        	<h:panelGroup id="soundCol">#{status.playSound}</h:panelGroup>
+						        </p:column>
+		        		 	</p:dataTable>
+		        		 </p:panel>
+		        		 <p:panel id="serv3Panel" header="#{checkboxBean.serv3Name} - Blue" toggleable="true" collapsed="#{dashboardBean.serv3Collapsed}">
+		        		 	<p:ajax event="toggle" listener="#{dashboardBean.handleServ3Toggle}"/>
+		        		 	<p:dataTable binding="#{serv3Table}" var="status" value="#{wvwObjectiveBean.blueWorldStatus}" styleClass="hide-column-names" rowStyleClass="#{status.color}">
+		        		 		<p:column>  
+						            <h:panelGroup id="eventCol">#{status.objective}</h:panelGroup>  
+						        </p:column>  
+						        <p:column styleClass="soundClass">
+						        	<h:panelGroup id="soundCol">#{status.playSound}</h:panelGroup>
+						        </p:column>
+		        		 	</p:dataTable>
+		        		 </p:panel>
+		        		 <p:panel id="ebPanel" header="EB" toggleable="true" collapsed="#{dashboardBean.ebCollapsed}">
+		        		 	<p:ajax event="toggle" listener="#{dashboardBean.handleEBToggle}"/>
+		        		 	<p:dataTable binding="#{ebTable}" var="status" value="#{wvwObjectiveBean.ebWorldStatus}" styleClass="hide-column-names" rowStyleClass="#{status.color}">
+		        		 		<p:column>  
+						            <h:panelGroup id="eventCol">#{status.objective}</h:panelGroup>  
+						        </p:column>  
+						        <p:column styleClass="soundClass">
+						        	<h:panelGroup id="soundCol">#{status.playSound}</h:panelGroup>
+						        </p:column>
+		        		 	</p:dataTable>
+		        		 </p:panel>
+	        		 </p:dashboard>
+	        	</h:form>
+    		</p:layoutUnit>
+    		<p:layoutUnit id="east" position="east" header="Checkboxes" size="#{checkboxBean.eastSize}" collapsed="#{checkboxBean.eastCollapsed}" 
+        		closable="false" collapsible="true" resizable="true">
+        		<h:form id="checkboxes">
+	        		<p:selectManyCheckbox value="#{checkboxBean.selectedObjectives}"  
+			            layout="pageDirection" id="smcb">  
+			            <f:selectItems value="#{checkboxBean.objectives}" />
+			            <p:ajax listener="#{checkboxBean.handleCheckbox(serv1Table, serv2Table, serv3Table, ebTable)}"/> 
+			        </p:selectManyCheckbox>
+			        <p:selectManyCheckbox layout="pageDirection" id="playSoundCB" styleClass="soundClassCB">
+		            	<f:selectItem itemLabel="Play Sound" itemValue="Play Sound" />  
+		            </p:selectManyCheckbox>  
+		        </h:form>
+        	</p:layoutUnit>
+    	</p:layout>
+    </h:body>
+</html>
